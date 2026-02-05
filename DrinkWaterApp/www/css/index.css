@@ -1,0 +1,1415 @@
+/**
+    Glassmorphism Water Tracker - 毛玻璃风格喝水打卡
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --glass-shadow: rgba(31, 38, 135, 0.37);
+    --accent-blue: rgba(79, 172, 254, 0.8);
+    --accent-purple: rgba(118, 75, 162, 0.8);
+    --text-light: rgba(255, 255, 255, 0.95);
+    --text-dark: rgba(255, 255, 255, 0.7);
+}
+
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    box-sizing: border-box;
+}
+
+html {
+    overscroll-behavior: none;
+}
+
+body {
+    -webkit-touch-callout: none;
+    -webkit-text-size-adjust: none;
+    -webkit-user-select: none;
+    margin: 0;
+    padding: 0;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+    text-size-adjust: none;
+    user-select: none;
+    width: 100%;
+    height: 100vh;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 16px;
+    overflow: hidden;
+    position: relative;
+
+    /* 阿狸背景图 */
+    background-image: url('https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=1920&h=1080&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* 背景遮罩层 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg,
+        rgba(102, 126, 234, 0.7) 0%,
+        rgba(118, 75, 162, 0.7) 50%,
+        rgba(240, 147, 251, 0.7) 100%);
+    z-index: 0;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* 添加装饰性浮动气泡 */
+.app::before,
+.app::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.app::before {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    top: -100px;
+    right: -100px;
+    animation: float 20s ease-in-out infinite;
+}
+
+.app::after {
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    bottom: -50px;
+    left: -50px;
+    animation: float 15s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(30px, -30px) scale(1.1);
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+    animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-light);
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stats-container {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 15px;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 毛玻璃卡片 - 主统计卡片 */
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    padding: 35px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+    box-shadow:
+        0 8px 32px 0 var(--glass-shadow),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+    left: 100%;
+}
+
+.stat-card:active {
+    transform: scale(0.98);
+}
+
+/* 小统计卡片 */
+.stat-card-small {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-radius: 18px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid var(--glass-border);
+    box-shadow:
+        0 4px 24px 0 rgba(31, 38, 135, 0.25),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stat-card-small:active {
+    transform: scale(0.97);
+}
+
+.stat-number {
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: -2px;
+}
+
+.stat-label {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-dark);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.stat-small-number {
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 5px;
+    text-shadow: 0 2px 15px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.stat-small-label {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-dark);
+    letter-spacing: 0.3px;
+}
+
+.button-container {
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+/* 毛玻璃打卡按钮 */
+.drink-button {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.3) 0%, rgba(0, 242, 254, 0.3) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 60px;
+    padding: 22px 55px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    box-shadow:
+        0 8px 32px 0 rgba(79, 172, 254, 0.4),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+        0 0 0 0 rgba(79, 172, 254, 0.5);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+}
+
+.drink-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.drink-button:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 12px 40px 0 rgba(79, 172, 254, 0.5),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+        0 0 0 8px rgba(79, 172, 254, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.drink-button:active {
+    transform: scale(0.96);
+    box-shadow:
+        0 4px 20px 0 rgba(79, 172, 254, 0.4),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+}
+
+.drink-button:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.button-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.button-text {
+    font-size: 22px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* 毛玻璃记录容器 */
+.records-container {
+    flex: 1;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    padding: 24px;
+    border: 1px solid var(--glass-border);
+    box-shadow:
+        0 8px 32px 0 var(--glass-shadow),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.records-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.records-container h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+/* 毛玻璃设置按钮 */
+.settings-button {
+    background: rgba(150, 100, 200, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(150, 100, 200, 0.3);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.settings-button:hover {
+    background: rgba(150, 100, 200, 0.3);
+    border-color: rgba(150, 100, 200, 0.5);
+    transform: translateY(-1px) rotate(90deg);
+    box-shadow: 0 4px 12px rgba(150, 100, 200, 0.3);
+}
+
+.settings-button:active {
+    transform: scale(0.95) rotate(90deg);
+}
+
+/* 毛玻璃清空按钮 */
+.clear-button {
+    background: rgba(255, 107, 107, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+}
+
+.clear-button:hover {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: rgba(255, 107, 107, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.clear-button:active {
+    transform: scale(0.95);
+    background: rgba(255, 82, 82, 0.3);
+}
+
+.records-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* 自定义滚动条 */
+.records-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.records-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.records-list::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    transition: background 0.3s;
+}
+
+.records-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 毛玻璃记录项 */
+.record-item {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    animation: slideInRight 0.4s ease-out backwards;
+}
+
+.record-item:nth-child(1) { animation-delay: 0.1s; }
+.record-item:nth-child(2) { animation-delay: 0.15s; }
+.record-item:nth-child(3) { animation-delay: 0.2s; }
+.record-item:nth-child(4) { animation-delay: 0.25s; }
+.record-item:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.record-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(180deg, rgba(79, 172, 254, 0.8), rgba(118, 75, 162, 0.8));
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.record-item:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(4px);
+}
+
+.record-item:hover::before {
+    opacity: 1;
+}
+
+.record-item:active {
+    transform: scale(0.98) translateX(4px);
+}
+
+.record-icon {
+    font-size: 32px;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.2));
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+.record-info {
+    flex: 1;
+}
+
+.record-time {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 4px;
+    letter-spacing: 0.3px;
+}
+
+.record-date {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-dark);
+    letter-spacing: 0.2px;
+}
+
+/* 毛玻璃删除按钮 */
+.delete-button {
+    background: rgba(255, 107, 107, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 50px;
+    letter-spacing: 0.3px;
+}
+
+.delete-button:hover {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: rgba(255, 107, 107, 0.5);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.delete-button:active {
+    transform: scale(0.95);
+    background: rgba(255, 82, 82, 0.4);
+}
+
+.empty-message {
+    text-align: center;
+    color: var(--text-dark);
+    padding: 50px 20px;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    line-height: 1.6;
+}
+
+/* 毛玻璃设备状态 */
+.device-status {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.event {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 10px 20px;
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    letter-spacing: 0.3px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event.listening {
+    display: block;
+}
+
+.event.received {
+    display: none;
+}
+
+#deviceready.ready .event.listening {
+    display: none;
+}
+
+#deviceready.ready .event.received {
+    display: block;
+    animation: fadeIn 0.5s ease-out, pulse 2s ease-in-out infinite 1s;
+}
+
+/* 深色模式适配 */
+@media screen and (prefers-color-scheme: dark) {
+    body {
+        background:
+            radial-gradient(circle at 20% 80%, rgba(80, 79, 138, 0.4) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+            radial-gradient(circle at 40% 40%, rgba(168, 85, 247, 0.2) 0%, transparent 40%),
+            linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+    }
+
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --text-light: rgba(255, 255, 255, 0.95);
+        --text-dark: rgba(255, 255, 255, 0.6);
+    }
+}
+
+/* 响应式设计 */
+@media screen and (min-width: 768px) {
+    .app {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 40px 30px;
+    }
+
+    h1 {
+        font-size: 42px;
+    }
+
+    .stat-number {
+        font-size: 80px;
+    }
+
+    .stats-container {
+        flex-direction: row;
+    }
+
+    .stat-card {
+        flex: 2;
+    }
+
+    .stat-card-small {
+        flex: 1;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .drink-button:hover {
+        transform: none;
+        box-shadow:
+            0 8px 32px 0 rgba(79, 172, 254, 0.4),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .record-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: none;
+    }
+
+    .record-item:hover::before {
+        opacity: 0;
+    }
+}
+
+/* 性能优化 - 减少重绘 */
+.stat-number,
+.stat-small-number,
+.drink-button,
+.record-item {
+    will-change: transform;
+}
+
+/* 无障碍支持 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 高对比度模式 */
+@media (prefers-contrast: high) {
+    .stat-card,
+    .stat-card-small,
+    .records-container,
+    .record-item {
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .drink-button {
+        border-width: 3px;
+    }
+}
+
+/* ========================================
+   二次元少女提醒助手样式
+   ======================================== */
+
+.reminder-assistant {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    pointer-events: none;
+}
+
+/* 角色容器 */
+.assistant-character {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    pointer-events: auto;
+    cursor: pointer;
+    animation: characterFloat 3s ease-in-out infinite;
+}
+
+@keyframes characterFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 角色脸部 - 阿狸风格 */
+.character-face {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(255, 240, 230, 0.95) 0%, rgba(255, 220, 200, 0.95) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 200, 150, 0.6);
+    box-shadow:
+        0 8px 32px rgba(255, 180, 120, 0.4),
+        inset 0 2px 10px rgba(255, 255, 255, 0.5);
+    top: 10px;
+    left: 5px;
+    z-index: 2;
+}
+
+/* 眼睛容器 */
+.character-eyes {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 18px;
+}
+
+.eye {
+    width: 12px;
+    height: 16px;
+    background: linear-gradient(180deg, #4a3f35 0%, #2d2520 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: relative;
+    animation: blink 4s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 96%, 100% {
+        transform: scaleY(1);
+    }
+    98% {
+        transform: scaleY(0.1);
+    }
+}
+
+.pupil {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle at 30% 30%, #fff 0%, #fff 20%, transparent 20%, transparent 100%),
+                linear-gradient(135deg, #8b7355 0%, #5d4a3a 100%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: eyeMove 5s ease-in-out infinite;
+}
+
+@keyframes eyeMove {
+    0%, 100% {
+        transform: translate(-50%, -50%);
+    }
+    25% {
+        transform: translate(-30%, -50%);
+    }
+    75% {
+        transform: translate(-70%, -50%);
+    }
+}
+
+/* 嘴巴 */
+.character-mouth {
+    position: absolute;
+    width: 20px;
+    height: 10px;
+    border: 2px solid rgba(255, 120, 120, 0.8);
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: smile 3s ease-in-out infinite;
+}
+
+@keyframes smile {
+    0%, 100% {
+        width: 20px;
+        height: 10px;
+    }
+    50% {
+        width: 24px;
+        height: 12px;
+    }
+}
+
+/* 腮红 - 阿狸风格 */
+.character-blush {
+    position: absolute;
+    width: 15px;
+    height: 10px;
+    background: radial-gradient(ellipse, rgba(255, 180, 150, 0.5) 0%, transparent 70%);
+    border-radius: 50%;
+    top: 38px;
+}
+
+.left-blush {
+    left: 8px;
+}
+
+.right-blush {
+    right: 8px;
+}
+
+/* 添加狐狸胡须标记 */
+.character-face::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 180, 120, 0.4);
+    border-radius: 50%;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow:
+        -12px 0 0 rgba(255, 180, 120, 0.3),
+        12px 0 0 rgba(255, 180, 120, 0.3);
+}
+
+/* 头发 - 阿狸的白色长发 */
+.character-hair {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 80px;
+    z-index: 1;
+}
+
+.hair-strand {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 240, 250, 0.9) 100%);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 200, 150, 0.4);
+    box-shadow: 0 4px 16px rgba(255, 200, 150, 0.3);
+}
+
+.strand-1 {
+    width: 35px;
+    height: 45px;
+    top: 5px;
+    left: 8px;
+    border-radius: 50% 50% 20% 50%;
+    transform: rotate(-15deg);
+    animation: hairSway1 4s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 220, 0.9) 100%);
+}
+
+.strand-2 {
+    width: 30px;
+    height: 50px;
+    top: 0;
+    left: 25px;
+    border-radius: 50%;
+    animation: hairSway2 3.5s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 245, 230, 0.9) 100%);
+}
+
+.strand-3 {
+    width: 35px;
+    height: 45px;
+    top: 5px;
+    right: 8px;
+    border-radius: 50% 50% 50% 20%;
+    transform: rotate(15deg);
+    animation: hairSway3 4.2s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 220, 0.9) 100%);
+}
+
+/* 添加狐狸耳朵 */
+.character-hair::before,
+.character-hair::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 30px;
+    background: linear-gradient(135deg, rgba(255, 200, 150, 0.9) 0%, rgba(255, 180, 120, 0.9) 100%);
+    border-radius: 50% 50% 20% 20%;
+    border: 2px solid rgba(255, 200, 150, 0.5);
+    box-shadow: 0 4px 12px rgba(255, 180, 120, 0.3);
+    z-index: 3;
+}
+
+.character-hair::before {
+    top: -5px;
+    left: 10px;
+    transform: rotate(-20deg);
+    animation: earTwitch1 3s ease-in-out infinite;
+}
+
+.character-hair::after {
+    top: -5px;
+    right: 10px;
+    transform: rotate(20deg);
+    animation: earTwitch2 3s ease-in-out infinite 0.5s;
+}
+
+@keyframes earTwitch1 {
+    0%, 100% {
+        transform: rotate(-20deg);
+    }
+    50% {
+        transform: rotate(-25deg);
+    }
+}
+
+@keyframes earTwitch2 {
+    0%, 100% {
+        transform: rotate(20deg);
+    }
+    50% {
+        transform: rotate(25deg);
+    }
+}
+
+@keyframes hairSway1 {
+    0%, 100% {
+        transform: rotate(-15deg);
+    }
+    50% {
+        transform: rotate(-20deg);
+    }
+}
+
+@keyframes hairSway2 {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(-5deg);
+    }
+}
+
+@keyframes hairSway3 {
+    0%, 100% {
+        transform: rotate(15deg);
+    }
+    50% {
+        transform: rotate(20deg);
+    }
+}
+
+/* 聊天气泡 */
+.chat-bubble {
+    position: relative;
+    max-width: 200px;
+    min-width: 150px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 20px;
+    padding: 15px 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 8px 32px rgba(150, 100, 200, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateX(20px) scale(0.8);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chat-bubble.show {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+    animation: bubbleBounce 0.6s ease-out;
+}
+
+@keyframes bubbleBounce {
+    0% {
+        transform: translateX(20px) scale(0.8);
+    }
+    50% {
+        transform: translateX(-5px) scale(1.05);
+    }
+    100% {
+        transform: translateX(0) scale(1);
+    }
+}
+
+.bubble-content {
+    position: relative;
+    z-index: 1;
+}
+
+.bubble-content p {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-light);
+    line-height: 1.5;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.3px;
+}
+
+/* 气泡尾巴 */
+.bubble-tail {
+    position: absolute;
+    right: -12px;
+    bottom: 20px;
+    width: 0;
+    height: 0;
+    border-left: 15px solid rgba(255, 255, 255, 0.2);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    filter: blur(1px);
+}
+
+.bubble-tail::before {
+    content: '';
+    position: absolute;
+    right: 2px;
+    top: -6px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid rgba(255, 255, 255, 0.15);
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+}
+
+/* 角色点击效果 */
+.assistant-character:active {
+    transform: scale(0.95) translateY(-10px);
+}
+
+/* 气泡闪烁提示动画 */
+@keyframes bubblePulse {
+    0%, 100% {
+        box-shadow:
+            0 8px 32px rgba(150, 100, 200, 0.3),
+            inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 8px 40px rgba(150, 100, 200, 0.5),
+            0 0 20px rgba(255, 255, 255, 0.3),
+            inset 0 2px 10px rgba(255, 255, 255, 0.3);
+    }
+}
+
+.chat-bubble.pulse {
+    animation: bubblePulse 2s ease-in-out infinite;
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 480px) {
+    .reminder-assistant {
+        bottom: 70px;
+        right: 15px;
+    }
+
+    .assistant-character {
+        width: 70px;
+        height: 70px;
+    }
+
+    .character-face {
+        width: 60px;
+        height: 60px;
+    }
+
+    .chat-bubble {
+        max-width: 160px;
+        min-width: 130px;
+        padding: 12px 15px;
+    }
+
+    .bubble-content p {
+        font-size: 14px;
+    }
+}
+
+/* 深色模式适配 */
+@media screen and (prefers-color-scheme: dark) {
+    .character-face {
+        background: linear-gradient(135deg, rgba(255, 200, 200, 0.9) 0%, rgba(255, 180, 180, 0.9) 100%);
+    }
+
+    .chat-bubble {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* ========================================
+   设置面板样式
+   ======================================== */
+
+.settings-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.settings-panel.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settings-content {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-radius: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    width: 90%;
+    max-width: 400px;
+    padding: 0;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-panel.show .settings-content {
+    transform: scale(1);
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.settings-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-light);
+    letter-spacing: 0.3px;
+}
+
+.close-settings {
+    background: rgba(255, 107, 107, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-settings:hover {
+    background: rgba(255, 107, 107, 0.3);
+    border-color: rgba(255, 107, 107, 0.5);
+    transform: rotate(90deg);
+}
+
+.close-settings:active {
+    transform: scale(0.9) rotate(90deg);
+}
+
+.settings-body {
+    padding: 24px;
+}
+
+.setting-item {
+    margin-bottom: 24px;
+}
+
+.setting-item:last-child {
+    margin-bottom: 0;
+}
+
+.setting-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-light);
+    letter-spacing: 0.3px;
+}
+
+.setting-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: rgba(150, 100, 200, 0.8);
+}
+
+.setting-label-text {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    letter-spacing: 0.3px;
+}
+
+.interval-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.interval-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+}
+
+.interval-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.interval-btn.active {
+    background: linear-gradient(135deg, rgba(150, 100, 200, 0.4) 0%, rgba(120, 80, 180, 0.4) 100%);
+    border-color: rgba(150, 100, 200, 0.5);
+    box-shadow: 0 4px 16px rgba(150, 100, 200, 0.3);
+}
+
+.interval-btn:active {
+    transform: scale(0.95);
+}
+
+.test-reminder-btn {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.3) 0%, rgba(0, 242, 254, 0.3) 100%);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 14px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.5px;
+    box-shadow:
+        0 4px 20px rgba(79, 172, 254, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.test-reminder-btn:hover {
+    background: linear-gradient(135deg, rgba(79, 172, 254, 0.4) 0%, rgba(0, 242, 254, 0.4) 100%);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow:
+        0 6px 24px rgba(79, 172, 254, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.test-reminder-btn:active {
+    transform: scale(0.98);
+}
+
+/* 响应式调整 */
+@media screen and (max-width: 480px) {
+    .settings-content {
+        width: 95%;
+    }
+
+    .interval-selector {
+        gap: 6px;
+    }
+
+    .interval-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}

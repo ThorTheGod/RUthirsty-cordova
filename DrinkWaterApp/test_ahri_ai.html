@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>阿狸 AI 对话测试</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.5) 0%, rgba(0, 242, 254, 0.5) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            min-height: 50px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .context-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦊 阿狸 AI 对话系统测试</h1>
+        
+        <div class="test-section">
+            <h2>📊 当前上下文</h2>
+            <div id="contextInfo" class="context-info">加载中...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎭 点击对话测试</h2>
+            <button onclick="testClickDialogue()">生成点击对话</button>
+            <button onclick="testMultipleClicks()">连续生成10次</button>
+            <div id="clickOutput" class="output">点击按钮测试...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>⏰ 提醒对话测试</h2>
+            <button onclick="testReminderDialogue()">生成提醒对话</button>
+            <button onclick="testMultipleReminders()">连续生成10次</button>
+            <div id="reminderOutput" class="output">点击按钮测试...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>👋 欢迎对话测试</h2>
+            <button onclick="testWelcomeDialogue()">生成欢迎对话</button>
+            <div id="welcomeOutput" class="output">点击按钮测试...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ 打卡后对话测试</h2>
+            <button onclick="testAfterDrinkDialogue()">生成打卡后对话</button>
+            <div id="afterDrinkOutput" class="output">点击按钮测试...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>📜 对话历史</h2>
+            <button onclick="showHistory()">查看历史记录</button>
+            <button onclick="clearHistory()">清空历史</button>
+            <div id="historyOutput" class="output">点击按钮查看...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 模拟场景测试</h2>
+            <button onclick="simulateScenario('morning')">模拟早晨场景</button>
+            <button onclick="simulateScenario('afternoon')">模拟下午场景</button>
+            <button onclick="simulateScenario('evening')">模拟傍晚场景</button>
+            <div id="scenarioOutput" class="output">点击按钮测试...</div>
+        </div>
+    </div>
+
+    <script src="js/index.js"></script>
+    <script>
+        // 初始化对话生成器（如果还没有）
+        if (typeof ahriDialogue === 'undefined') {
+            const ahriDialogue = new AhriDialogueGenerator();
+        }
+
+        // 更新上下文显示
+        function updateContextDisplay() {
+            const context = ahriDialogue.contextData;
+            const info = `
+                <strong>今日喝水次数:</strong> ${context.todayCount} 次<br>
+                <strong>累计喝水次数:</strong> ${context.totalCount} 次<br>
+                <strong>当前时间段:</strong> ${context.timeOfDay}<br>
+                <strong>上次喝水时间:</strong> ${context.lastDrinkTime ? new Date(context.lastDrinkTime).toLocaleString() : '无'}<br>
+                <strong>对话历史数量:</strong> ${ahriDialogue.dialogueHistory.length} 条
+            `;
+            document.getElementById('contextInfo').innerHTML = info;
+        }
+
+        // 测试点击对话
+        function testClickDialogue() {
+            const dialogue = ahriDialogue.generateDialogue('click');
+            document.getElementById('clickOutput').innerHTML = `<strong>阿狸:</strong> "${dialogue}"`;
+            updateContextDisplay();
+        }
+
+        // 测试多次点击
+        function testMultipleClicks() {
+            let output = '<strong>连续10次点击对话:</strong><br><br>';
+            for (let i = 1; i <= 10; i++) {
+                const dialogue = ahriDialogue.generateDialogue('click');
+                output += `${i}. ${dialogue}<br>`;
+            }
+            document.getElementById('clickOutput').innerHTML = output;
+            updateContextDisplay();
+        }
+
+        // 测试提醒对话
+        function testReminderDialogue() {
+            const dialogue = ahriDialogue.generateDialogue('reminder');
+            document.getElementById('reminderOutput').innerHTML = `<strong>阿狸:</strong> "${dialogue}"`;
+            updateContextDisplay();
+        }
+
+        // 测试多次提醒
+        function testMultipleReminders() {
+            let output = '<strong>连续10次提醒对话:</strong><br><br>';
+            for (let i = 1; i <= 10; i++) {
+                const dialogue = ahriDialogue.generateDialogue('reminder');
+                output += `${i}. ${dialogue}<br>`;
+            }
+            document.getElementById('reminderOutput').innerHTML = output;
+            updateContextDisplay();
+        }
+
+        // 测试欢迎对话
+        function testWelcomeDialogue() {
+            const dialogue = ahriDialogue.generateDialogue('welcome');
+            document.getElementById('welcomeOutput').innerHTML = `<strong>阿狸:</strong> "${dialogue}"`;
+            updateContextDisplay();
+        }
+
+        // 测试打卡后对话
+        function testAfterDrinkDialogue() {
+            const dialogue = ahriDialogue.generateDialogue('afterDrink');
+            document.getElementById('afterDrinkOutput').innerHTML = `<strong>阿狸:</strong> "${dialogue}"`;
+            updateContextDisplay();
+        }
+
+        // 显示历史记录
+        function showHistory() {
+            const history = ahriDialogue.dialogueHistory;
+            if (history.length === 0) {
+                document.getElementById('historyOutput').innerHTML = '暂无历史记录';
+                return;
+            }
+            let output = '<strong>最近的对话历史:</strong><br><br>';
+            history.slice(-10).reverse().forEach((item, index) => {
+                const time = new Date(item.timestamp).toLocaleTimeString();
+                output += `${index + 1}. [${time}] [${item.type}] ${item.dialogue}<br>`;
+            });
+            document.getElementById('historyOutput').innerHTML = output;
+        }
+
+        // 清空历史
+        function clearHistory() {
+            ahriDialogue.dialogueHistory = [];
+            document.getElementById('historyOutput').innerHTML = '历史记录已清空';
+            updateContextDisplay();
+        }
+
+        // 模拟场景
+        function simulateScenario(scenario) {
+            let output = `<strong>模拟${scenario}场景:</strong><br><br>`;
+            
+            // 模拟不同的喝水次数
+            const counts = [0, 2, 5, 8, 12];
+            counts.forEach(count => {
+                ahriDialogue.updateContext({ todayCount: count });
+                const dialogue = ahriDialogue.generateDialogue('click');
+                output += `喝水${count}次: ${dialogue}<br>`;
+            });
+            
+            document.getElementById('scenarioOutput').innerHTML = output;
+            updateContextDisplay();
+        }
+
+        // 页面加载时更新上下文
+        updateContextDisplay();
+        setInterval(updateContextDisplay, 5000); // 每5秒更新一次
+    </script>
+</body>
+</html>

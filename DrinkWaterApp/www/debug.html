@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>调试 - 喝水记录</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .section {
+            background: #2d2d2d;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #3e3e3e;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .warning { color: #dcdcaa; }
+    </style>
+</head>
+<body>
+    <h1>🔍 喝水记录调试工具</h1>
+    
+    <div class="section">
+        <h2>📊 当前状态</h2>
+        <button onclick="checkStatus()">检查状态</button>
+        <button onclick="viewRecords()">查看记录</button>
+        <button onclick="clearStorage()">清空存储</button>
+        <button onclick="addTestRecord()">添加测试记录</button>
+        <pre id="status">点击按钮查看状态...</pre>
+    </div>
+
+    <div class="section">
+        <h2>💾 LocalStorage 内容</h2>
+        <button onclick="viewStorage()">查看存储</button>
+        <pre id="storage">点击按钮查看...</pre>
+    </div>
+
+    <div class="section">
+        <h2>🧪 测试操作</h2>
+        <button onclick="testSave()">测试保存</button>
+        <button onclick="testLoad()">测试加载</button>
+        <button onclick="fixRecords()">修复记录格式</button>
+        <pre id="test">点击按钮测试...</pre>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'drinkWaterRecords';
+
+        function checkStatus() {
+            const output = document.getElementById('status');
+            let result = '<span class="success">✓ 检查结果:</span>\n\n';
+            
+            // 检查 localStorage
+            const stored = localStorage.getItem(STORAGE_KEY);
+            result += `LocalStorage 键: ${STORAGE_KEY}\n`;
+            result += `存储状态: ${stored ? '<span class="success">存在</span>' : '<span class="error">不存在</span>'}\n`;
+            
+            if (stored) {
+                try {
+                    const records = JSON.parse(stored);
+                    result += `记录数量: <span class="success">${records.length}</span>\n`;
+                    result += `数据类型: ${Array.isArray(records) ? '<span class="success">数组</span>' : '<span class="error">非数组</span>'}\n`;
+                    
+                    if (records.length > 0) {
+                        result += `\n最新记录:\n`;
+                        const latest = records[0];
+                        result += `  ID: ${latest.id}\n`;
+                        result += `  时间: ${latest.time}\n`;
+                        result += `  日期: ${latest.date}\n`;
+                    }
+                } catch (e) {
+                    result += `<span class="error">解析错误: ${e.message}</span>\n`;
+                }
+            }
+            
+            output.innerHTML = result;
+        }
+
+        function viewRecords() {
+            const output = document.getElementById('status');
+            const stored = localStorage.getItem(STORAGE_KEY);
+            
+            if (!stored) {
+                output.innerHTML = '<span class="warning">⚠ 没有找到记录</span>';
+                return;
+            }
+            
+            try {
+                const records = JSON.parse(stored);
+                let result = `<span class="success">✓ 找到 ${records.length} 条记录:</span>\n\n`;
+                
+                records.forEach((record, index) => {
+                    result += `${index + 1}. ${record.date} ${record.time} (ID: ${record.id})\n`;
+                });
+                
+                output.innerHTML = result;
+            } catch (e) {
+                output.innerHTML = `<span class="error">✗ 解析失败: ${e.message}</span>`;
+            }
+        }
+
+        function viewStorage() {
+            const output = document.getElementById('storage');
+            const stored = localStorage.getItem(STORAGE_KEY);
+            
+            if (!stored) {
+                output.innerHTML = '<span class="warning">⚠ LocalStorage 为空</span>';
+                return;
+            }
+            
+            output.textContent = stored;
+        }
+
+        function clearStorage() {
+            if (confirm('确定要清空所有记录吗？')) {
+                localStorage.removeItem(STORAGE_KEY);
+                document.getElementById('status').innerHTML = '<span class="success">✓ 存储已清空</span>';
+            }
+        }
+
+        function addTestRecord() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            let records = stored ? JSON.parse(stored) : [];
+            
+            const now = new Date();
+            const record = {
+                id: Date.now(),
+                timestamp: now.getTime(),
+                date: formatDate(now),
+                time: formatTime(now)
+            };
+            
+            records.unshift(record);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            
+            document.getElementById('status').innerHTML = 
+                `<span class="success">✓ 已添加测试记录</span>\n\n` +
+                `ID: ${record.id}\n` +
+                `时间: ${record.time}\n` +
+                `日期: ${record.date}\n` +
+                `总记录数: ${records.length}`;
+        }
+
+        function testSave() {
+            const output = document.getElementById('test');
+            try {
+                const testData = [
+                    {
+                        id: Date.now(),
+                        timestamp: Date.now(),
+                        date: formatDate(new Date()),
+                        time: formatTime(new Date())
+                    }
+                ];
+                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(testData));
+                output.innerHTML = '<span class="success">✓ 保存测试成功</span>';
+            } catch (e) {
+                output.innerHTML = `<span class="error">✗ 保存失败: ${e.message}</span>`;
+            }
+        }
+
+        function testLoad() {
+            const output = document.getElementById('test');
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (!stored) {
+                    output.innerHTML = '<span class="warning">⚠ 没有数据</span>';
+                    return;
+                }
+                
+                const records = JSON.parse(stored);
+                output.innerHTML = 
+                    `<span class="success">✓ 加载成功</span>\n\n` +
+                    `记录数: ${records.length}\n` +
+                    `数据: ${JSON.stringify(records, null, 2)}`;
+            } catch (e) {
+                output.innerHTML = `<span class="error">✗ 加载失败: ${e.message}</span>`;
+            }
+        }
+
+        function fixRecords() {
+            const output = document.getElementById('test');
+            const stored = localStorage.getItem(STORAGE_KEY);
+            
+            if (!stored) {
+                output.innerHTML = '<span class="warning">⚠ 没有数据需要修复</span>';
+                return;
+            }
+            
+            try {
+                let records = JSON.parse(stored);
+                
+                // 确保是数组
+                if (!Array.isArray(records)) {
+                    records = [];
+                }
+                
+                // 修复每条记录
+                records = records.map(record => {
+                    if (!record.id) record.id = Date.now() + Math.random();
+                    if (!record.timestamp) record.timestamp = Date.now();
+                    if (!record.date) record.date = formatDate(new Date(record.timestamp));
+                    if (!record.time) record.time = formatTime(new Date(record.timestamp));
+                    return record;
+                });
+                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+                output.innerHTML = 
+                    `<span class="success">✓ 修复完成</span>\n\n` +
+                    `修复了 ${records.length} 条记录`;
+            } catch (e) {
+                output.innerHTML = `<span class="error">✗ 修复失败: ${e.message}</span>`;
+            }
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // 自动检查状态
+        window.onload = () => {
+            checkStatus();
+        };
+    </script>
+</body>
+</html>

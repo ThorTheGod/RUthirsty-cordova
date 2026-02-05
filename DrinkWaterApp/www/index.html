@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, please refer to the docs:
+            https://cordova.apache.org/docs/en/latest/
+        Some notes:
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+        <link rel="stylesheet" href="css/index.css">
+        <title>喝水打卡</title>
+    </head>
+    <body>
+        <div class="app">
+            <header>
+                <h1>💧 喝水打卡</h1>
+            </header>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="todayCount">0</div>
+                    <div class="stat-label">今日喝水次数</div>
+                </div>
+                <div class="stat-card-small">
+                    <div class="stat-small-number" id="totalCount">0</div>
+                    <div class="stat-small-label">总计次数</div>
+                </div>
+            </div>
+
+            <div class="button-container">
+                <button id="drinkButton" class="drink-button">
+                    <span class="button-icon">💧</span>
+                    <span class="button-text">打卡喝水</span>
+                </button>
+            </div>
+
+            <div class="records-container">
+                <div class="records-header">
+                    <h2>喝水记录</h2>
+                    <div class="header-buttons">
+                        <button id="settingsButton" class="settings-button" title="提醒设置">⚙️</button>
+                        <button id="clearButton" class="clear-button">清空记录</button>
+                    </div>
+                </div>
+                <div id="recordsList" class="records-list">
+                    <!-- 记录将动态添加到这里 -->
+                </div>
+            </div>
+
+            <!-- 设置面板 -->
+            <div id="settingsPanel" class="settings-panel">
+                <div class="settings-content">
+                    <div class="settings-header">
+                        <h3>⚙️ 提醒设置</h3>
+                        <button id="closeSettings" class="close-settings">✕</button>
+                    </div>
+                    <div class="settings-body">
+                        <div class="setting-item">
+                            <label class="setting-label">
+                                <input type="checkbox" id="reminderToggle" checked>
+                                <span>启用定时提醒</span>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="setting-label-text">提醒间隔（分钟）</label>
+                            <div class="interval-selector">
+                                <button class="interval-btn" data-interval="5">5分钟</button>
+                                <button class="interval-btn" data-interval="15">15分钟</button>
+                                <button class="interval-btn active" data-interval="30">30分钟</button>
+                                <button class="interval-btn" data-interval="60">60分钟</button>
+                                <button class="interval-btn" data-interval="120">2小时</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <button id="testReminder" class="test-reminder-btn">测试提醒</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deviceready" class="device-status">
+                <p class="event listening">正在连接设备...</p>
+                <p class="event received">设备已就绪</p>
+            </div>
+        </div>
+
+        <!-- 二次元少女提醒助手 -->
+        <div id="reminderAssistant" class="reminder-assistant">
+            <div class="assistant-character">
+                <div class="character-face">
+                    <div class="character-eyes">
+                        <div class="eye left-eye">
+                            <div class="pupil"></div>
+                        </div>
+                        <div class="eye right-eye">
+                            <div class="pupil"></div>
+                        </div>
+                    </div>
+                    <div class="character-mouth"></div>
+                    <div class="character-blush left-blush"></div>
+                    <div class="character-blush right-blush"></div>
+                </div>
+                <div class="character-hair">
+                    <div class="hair-strand strand-1"></div>
+                    <div class="hair-strand strand-2"></div>
+                    <div class="hair-strand strand-3"></div>
+                </div>
+            </div>
+            <div id="chatBubble" class="chat-bubble">
+                <div class="bubble-content">
+                    <p id="bubbleText">该喝水啦~ 💧</p>
+                </div>
+                <div class="bubble-tail"></div>
+            </div>
+        </div>
+
+        <script src="cordova.js"></script>
+        <script src="js/index.js"></script>
+    </body>
+</html>

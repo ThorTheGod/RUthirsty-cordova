@@ -1,0 +1,18 @@
+{
+  "name": "ahri-dialogue-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for Ahri AI dialogue generation using Claude API",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7"
+  }
+}
