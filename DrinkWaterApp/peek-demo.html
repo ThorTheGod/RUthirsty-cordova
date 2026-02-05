@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦊 阿狸偷看交互演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .demo-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .demo-card h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .demo-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .demo-card li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .demo-card li::before {
+            content: '✨';
+            position: absolute;
+            left: 0;
+        }
+
+        .visual-demo {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .visual-demo h2 {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+
+        .stage-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .stage {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            min-width: 200px;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stage h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .stage-visual {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .character {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ffb6c1 0%, #ffa07a 100%);
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            transition: all 0.5s ease;
+        }
+
+        /* Stage 1: Hidden */
+        .stage-1 .character {
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Stage 2: Peeking */
+        .stage-2 .character {
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            animation: peek-demo 2s ease-in-out infinite;
+        }
+
+        @keyframes peek-demo {
+            0%, 100% { right: -20px; }
+            50% { right: -10px; }
+        }
+
+        /* Stage 3: Visible */
+        .stage-3 .character {
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%) scale(1.2);
+            animation: surprised-demo 0.6s ease-out;
+        }
+
+        @keyframes surprised-demo {
+            0% { transform: translateY(-50%) scale(1) rotate(0deg); }
+            25% { transform: translateY(-50%) scale(1.3) rotate(-5deg); }
+            50% { transform: translateY(-50%) scale(1.35) rotate(5deg); }
+            75% { transform: translateY(-50%) scale(1.3) rotate(-3deg); }
+            100% { transform: translateY(-50%) scale(1.2) rotate(0deg); }
+        }
+
+        .arrow {
+            font-size: 40px;
+            opacity: 0.5;
+        }
+
+        .cta-section {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-section h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 5px;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stage-container {
+                flex-direction: column;
+            }
+
+            .arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>🦊 阿狸偷看交互演示</h1>
+        <p class="subtitle">让你的应用角色更加生动有趣！</p>
+
+        <!-- Visual Demo -->
+        <div class="visual-demo">
+            <h2>📱 交互流程演示</h2>
+            <div class="stage-container">
+                <div class="stage stage-1">
+                    <h3>1️⃣ 初始状态</h3>
+                    <div class="stage-visual">
+                        <div class="character">🦊</div>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 14px;">躲在屏幕边缘</p>
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="stage stage-2">
+                    <h3>2️⃣ 偷看模式</h3>
+                    <div class="stage-visual">
+                        <div class="character">👀</div>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 14px;">轻微摆动吸引注意</p>
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="stage stage-3">
+                    <h3>3️⃣ 完全出现</h3>
+                    <div class="stage-visual">
+                        <div class="character">😊</div>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 14px;">点击后惊讶出现</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="demo-grid">
+            <div class="demo-card">
+                <h2>✨ 核心特性</h2>
+                <ul>
+                    <li>默认躲在屏幕边缘</li>
+                    <li>偷看动画吸引注意</li>
+                    <li>点击后完全出现</li>
+                    <li>惊讶动画反馈</li>
+                    <li>自动恢复偷看状态</li>
+                    <li>AI 生成个性化对话</li>
+                </ul>
+            </div>
+
+            <div class="demo-card">
+                <h2>🎨 动画效果</h2>
+                <ul>
+                    <li>平滑的滑动过渡</li>
+                    <li>惊讶表情动画</li>
+                    <li>快速眨眼效果</li>
+                    <li>对话气泡弹出</li>
+                    <li>GPU 加速渲染</li>
+                    <li>60fps 流畅体验</li>
+                </ul>
+            </div>
+
+            <div class="demo-card">
+                <h2>📱 响应式设计</h2>
+                <ul>
+                    <li>桌面端完美适配</li>
+                    <li>移动端触摸优化</li>
+                    <li>平板设备支持</li>
+                    <li>横竖屏自适应</li>
+                    <li>不同屏幕尺寸</li>
+                    <li>高分辨率支持</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Technical Details -->
+        <div class="demo-card" style="margin-bottom: 40px;">
+            <h2>🔧 技术实现</h2>
+            <p>使用现代 CSS 和 JavaScript 技术实现流畅的交互效果：</p>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                <span class="feature-badge">CSS Transform</span>
+                <span class="feature-badge">CSS Animations</span>
+                <span class="feature-badge">GPU 加速</span>
+                <span class="feature-badge">事件监听</span>
+                <span class="feature-badge">状态管理</span>
+                <span class="feature-badge">响应式布局</span>
+            </div>
+
+            <div class="code-block">
+/* 偷看动画 */<br>
+@keyframes peek {<br>
+&nbsp;&nbsp;0%, 100% { right: -40px; }<br>
+&nbsp;&nbsp;50%      { right: -30px; }<br>
+}<br>
+<br>
+/* 惊讶动画 */<br>
+@keyframes surprised {<br>
+&nbsp;&nbsp;0%   { scale: 1.0,  rotate: 0deg }<br>
+&nbsp;&nbsp;50%  { scale: 1.15, rotate: 5deg }<br>
+&nbsp;&nbsp;100% { scale: 1.0,  rotate: 0deg }<br>
+}
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2>🚀 立即体验</h2>
+            <p style="font-size: 18px; margin-bottom: 20px;">
+                在浏览器中测试，或下载 APK 到手机体验完整功能
+            </p>
+
+            <div class="cta-buttons">
+                <a href="http://localhost:8000" class="btn btn-primary" target="_blank">
+                    🌐 浏览器演示
+                </a>
+                <a href="https://github.com/ThorTheGod/RUthirsty-cordova/actions" class="btn btn-secondary" target="_blank">
+                    📦 下载 APK
+                </a>
+                <a href="https://github.com/ThorTheGod/RUthirsty-cordova" class="btn btn-secondary" target="_blank">
+                    📚 查看源码
+                </a>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                <p style="font-size: 16px; opacity: 0.8;">
+                    💡 提示：点击右下角的阿狸，看看会发生什么！
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加一些交互效果
+        document.querySelectorAll('.demo-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // 控制台彩蛋
+        console.log('%c🦊 阿狸偷看交互演示', 'font-size: 24px; color: #ff69b4; font-weight: bold;');
+        console.log('%c✨ 欢迎查看源码！', 'font-size: 16px; color: #667eea;');
+        console.log('%c📚 文档：PEEK_INTERACTION_GUIDE.md', 'font-size: 14px; color: #764ba2;');
+    </script>
+</body>
+</html>
