@@ -66,6 +66,12 @@ function initApp() {
     const assistant = document.querySelector('.assistant-character');
     assistant.addEventListener('click', handleAssistantClick);
 
+    // 初始化角色为偷看状态
+    const reminderAssistant = document.getElementById('reminderAssistant');
+    setTimeout(() => {
+        reminderAssistant.classList.add('peeking');
+    }, 1000); // 1秒后开始偷看
+
     // 绑定气泡点击事件（关闭气泡）
     const chatBubble = document.getElementById('chatBubble');
     chatBubble.addEventListener('click', hideChatBubble);
@@ -709,8 +715,13 @@ function checkReminder() {
 
 // 显示提醒
 async function showReminder() {
+    const assistant = document.getElementById('reminderAssistant');
     const bubble = document.getElementById('chatBubble');
     const text = document.getElementById('bubbleText');
+
+    // 让角色完全出现
+    assistant.classList.remove('peeking');
+    assistant.classList.add('visible');
 
     // 使用AI生成提醒对话
     const message = await ahriDialogue.generateDialogue('reminder');
@@ -719,9 +730,13 @@ async function showReminder() {
     // 显示气泡
     bubble.classList.add('show', 'pulse');
 
-    // 5秒后自动隐藏
+    // 5秒后自动隐藏并恢复偷看状态
     setTimeout(() => {
         hideChatBubble();
+        setTimeout(() => {
+            assistant.classList.remove('visible');
+            assistant.classList.add('peeking');
+        }, 1000);
     }, 5000);
 
     console.log('显示提醒:', message);
@@ -749,11 +764,28 @@ function showChatBubble(message) {
 
 // 处理角色点击事件
 async function handleAssistantClick() {
+    const assistant = document.getElementById('reminderAssistant');
+    const character = document.querySelector('.assistant-character');
     const bubble = document.getElementById('chatBubble');
+
+    // 让角色完全出现
+    assistant.classList.remove('peeking');
+    assistant.classList.add('visible');
+
+    // 添加惊讶动画
+    character.classList.add('surprised', 'clicked');
+    setTimeout(() => {
+        character.classList.remove('clicked');
+    }, 300);
 
     // 如果气泡已显示，则隐藏
     if (bubble.classList.contains('show')) {
         hideChatBubble();
+        // 3秒后恢复偷看状态
+        setTimeout(() => {
+            assistant.classList.remove('visible');
+            assistant.classList.add('peeking');
+        }, 3000);
     } else {
         // 显示加载状态
         showChatBubble('思考中... 🤔');
@@ -761,6 +793,12 @@ async function handleAssistantClick() {
         // 使用AI生成个性化对话
         const message = await ahriDialogue.generateDialogue('click');
         showChatBubble(message);
+
+        // 对话结束后恢复偷看状态
+        setTimeout(() => {
+            assistant.classList.remove('visible');
+            assistant.classList.add('peeking');
+        }, 4000);
     }
 
     console.log('角色被点击');

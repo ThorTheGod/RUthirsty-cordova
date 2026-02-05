@@ -776,12 +776,35 @@ h1 {
 .reminder-assistant {
     position: fixed;
     bottom: 80px;
-    right: 20px;
+    right: -60px; /* 默认躲在屏幕外，只露出一点 */
     z-index: 2000;
     display: flex;
     align-items: flex-end;
     gap: 15px;
     pointer-events: none;
+    transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 偷看状态 - 露出一点点 */
+.reminder-assistant.peeking {
+    right: -40px;
+    animation: peek 2s ease-in-out infinite;
+}
+
+/* 完全出现状态 */
+.reminder-assistant.visible {
+    right: 20px;
+    animation: none;
+}
+
+/* 偷看动画 */
+@keyframes peek {
+    0%, 100% {
+        right: -40px;
+    }
+    50% {
+        right: -30px;
+    }
 }
 
 /* 角色容器 */
@@ -792,6 +815,18 @@ h1 {
     pointer-events: auto;
     cursor: pointer;
     animation: characterFloat 3s ease-in-out infinite;
+    transition: transform 0.3s ease;
+}
+
+/* 点击区域扩大 - 方便点击 */
+.assistant-character::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    cursor: pointer;
 }
 
 @keyframes characterFloat {
@@ -1076,11 +1111,14 @@ h1 {
     opacity: 0;
     transform: translateX(20px) scale(0.8);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 确保气泡在角色隐藏时也隐藏 */
+    visibility: hidden;
 }
 
 .chat-bubble.show {
     opacity: 1;
     transform: translateX(0) scale(1);
+    visibility: visible;
     animation: bubbleBounce 0.6s ease-out;
 }
 
@@ -1141,6 +1179,48 @@ h1 {
     transform: scale(0.95) translateY(-10px);
 }
 
+/* 角色悬停效果 - 鼓励点击 */
+.assistant-character:hover {
+    transform: scale(1.05);
+}
+
+/* 害羞/惊讶动画 */
+@keyframes surprised {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    50% {
+        transform: scale(1.15) rotate(5deg);
+    }
+    75% {
+        transform: scale(1.1) rotate(-3deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.assistant-character.surprised {
+    animation: surprised 0.6s ease-out, characterFloat 3s ease-in-out infinite 0.6s;
+}
+
+/* 眨眼动画增强 - 被点击时 */
+.assistant-character.clicked .eye {
+    animation: quickBlink 0.3s ease-out;
+}
+
+@keyframes quickBlink {
+    0%, 100% {
+        transform: scaleY(1);
+    }
+    50% {
+        transform: scaleY(0.1);
+    }
+}
+
 /* 气泡闪烁提示动画 */
 @keyframes bubblePulse {
     0%, 100% {
@@ -1164,6 +1244,14 @@ h1 {
 @media screen and (max-width: 480px) {
     .reminder-assistant {
         bottom: 70px;
+        right: -50px; /* 移动端也躲起来 */
+    }
+
+    .reminder-assistant.peeking {
+        right: -35px;
+    }
+
+    .reminder-assistant.visible {
         right: 15px;
     }
 
